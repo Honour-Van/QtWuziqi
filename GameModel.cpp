@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "GameModel.h"
-
+#include <QDebug>
 GameModel::GameModel()
 {
 
@@ -13,6 +13,7 @@ void GameModel::startGame(GameType type)
     gameType = type;
     // 初始棋盘
     gameMapVec.clear();
+//    gameMapVec.resize(kBoardSizeNum);
     for (int i = 0; i < kBoardSizeNum; i++)
     {
         std::vector<int> lineBoard;
@@ -20,7 +21,6 @@ void GameModel::startGame(GameType type)
             lineBoard.push_back(0);
         gameMapVec.push_back(lineBoard);
     }
-
     // 如果是AI模式，需要初始化评分数组
     if (gameType == BOT)
     {
@@ -43,9 +43,9 @@ void GameModel::startGame(GameType type)
 void GameModel::updateGameMap(int row, int col)
 {
     if (playerFlag)
-        gameMapVec[row][col] = 1;
-    else
         gameMapVec[row][col] = -1;
+    else
+        gameMapVec[row][col] = 1;
 
     // 换手
     playerFlag = !playerFlag;
@@ -56,7 +56,7 @@ void GameModel::actionByPerson(int row, int col)
     updateGameMap(row, col);
 }
 
-void GameModel::actionByAI(int &clickRow, int &clickCol)
+void GameModel::calculateByAI(int &clickRow, int &clickCol)
 {
     // 计算评分
     calculateScore();
@@ -89,6 +89,11 @@ void GameModel::actionByAI(int &clickRow, int &clickCol)
     std::pair<int, int> pointPair = maxPoints.at(index);
     clickRow = pointPair.first; // 记录落子点
     clickCol = pointPair.second;
+}
+
+void GameModel::actionByAI(int &clickRow, int &clickCol)
+{
+    calculateByAI(clickRow, clickCol);
     updateGameMap(clickRow, clickCol);
 }
 
@@ -331,4 +336,3 @@ bool GameModel::isDeadGame()
         }
     return true;
 }
-
